@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 )
 
@@ -67,7 +68,7 @@ func main() {
 		*jobs,
 	)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error()) // #nosec G705 -- CLI stderr output, not an XSS vector
 		os.Exit(1)
 	}
 	// Check for SIGINT and attempt to tell all jobs to cancel. If the user sends
@@ -122,11 +123,12 @@ func getInput(argFile string) (io.Reader, error) {
 		return os.Stdin, nil
 	}
 
-	stat, err := os.Stat(argFile)
+	cleanPath := filepath.Clean(argFile)
+	stat, err := os.Stat(cleanPath)
 
 	if err != nil || stat.IsDir() {
 		return nil, fmt.Errorf("must specify a valid file path for -a option")
 	}
 
-	return os.Open(argFile)
+	return os.Open(cleanPath)
 }

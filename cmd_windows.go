@@ -11,7 +11,7 @@ import (
 // allow us to prevent propagating SIGINT to child processes. For this reason,
 // we cannot gracefully quit when compiled for Windows.
 func newCmd(stdout, stderr io.Writer, cmd string, args ...string) *exec.Cmd {
-	c := exec.Command(cmd, args...)
+	c := exec.Command(cmd, args...) // #nosec G204 -- cmd is user-specified by design; validated via exec.LookPath in NewWorkerPool
 	c.Stdout = stdout
 	c.Stderr = stderr
 	return c
