@@ -13,7 +13,7 @@ import (
 // gives the app the ability to gracefully quit as the workers finish their
 // current jobs.
 func newCmd(stdout, stderr io.Writer, cmd string, args ...string) *exec.Cmd {
-	c := exec.Command(cmd, args...)
+	c := exec.Command(cmd, args...) // #nosec G204 -- cmd is user-specified by design; validated via exec.LookPath in NewWorkerPool
 	c.Stdout = stdout
 	c.Stderr = stderr
 	c.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}

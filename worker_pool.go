@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -80,8 +81,12 @@ func (w *WorkerPool) run() {
 		go w.startWorker(&wg)
 	}
 	wg.Wait()
-	w.out.Flush()
-	w.err.Flush()
+	if err := w.out.Flush(); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to flush stdout: %s\n", err)
+	}
+	if err := w.err.Flush(); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to flush stderr: %s\n", err)
+	}
 }
 
 func (w *WorkerPool) startWorker(wg *sync.WaitGroup) {
